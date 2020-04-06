@@ -68,6 +68,7 @@ app.post('/api/auth', (newreq, response) => {
     }, function (err, res, body) {
       //it works!
       console.log(res)
+      response.send(res)
       
     });
   }
