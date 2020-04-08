@@ -3,6 +3,8 @@ const path = require("path")
 const bodyParser = require("body-parser")
 const app = express()
 const request = require("request")
+const https = require('https');
+const fs = require('fs');
 
 console.log(process.env)
 
@@ -51,7 +53,7 @@ const redirectURL =
   process.env.redirectURL || "https://client-transcipture.herokuapp.com/"
 let accessToken
 let userId
-let test
+let OauthPromise
 
 // Put all API endpoints under '/api'
 // app.get('/*', (req, res) => {
@@ -86,10 +88,10 @@ app.post("/api/auth", (newreq, response) => {
         //it works!
         //console.log(res)
         accessToken = JSON.parse(res.body).access_token
-        test = new Promise(function (resolve, reject) {
+        OauthPromise = new Promise(function (resolve, reject) {
           return resolve(accessToken)
         })
-        test.then((data) => {
+        OauthPromise.then((data) => {
           response.send(data)
         })
       }
@@ -110,10 +112,10 @@ app.get("/api/me", async (req, response, next) => {
     async function (err, res, body) {
       //console.log(res)
       let me = JSON.parse(res.body)
-      let chicken = new Promise(function (resolve, reject) {
+      let userDataPromise = new Promise(function (resolve, reject) {
         return resolve(me)
       })
-      chicken.then((data) => {
+      userDataPromise.then((data) => {
         console.log(data)
         userId = data.id
         console.log(userId)
@@ -124,8 +126,7 @@ app.get("/api/me", async (req, response, next) => {
 })
 
 app.get("/api/recordings", async (req, response, next) => {
-  let userId = req.param.userId
-  let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-04-04`
+  let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-01-01?to=2020-04-07`
 
   request(
     {
@@ -136,8 +137,9 @@ app.get("/api/recordings", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-      console.log(res)
-      response.send(res)
+      console.log("Get Meetings Data Response", res)
+      let firstFile = JSON.parse(res.body).meetings[0].recording_files[0].download_url
+      response.send(firstFile)
     }
   )
 })
