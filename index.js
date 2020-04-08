@@ -50,6 +50,7 @@ const clientSecret = "2s0yXD5CXj3Sm49GCxUOxJTeDPdFIdyc"
 const redirectURL =
   process.env.redirectURL || "https://client-transcipture.herokuapp.com/"
 let accessToken
+let userId
 let test
 
 // Put all API endpoints under '/api'
@@ -89,9 +90,8 @@ app.post("/api/auth", (newreq, response) => {
           return resolve(accessToken)
         })
         test.then((data) => {
-          console.log(data)
+          response.send(data)
         })
-        response.send(accessToken)
       }
     )
   }
@@ -107,8 +107,36 @@ app.get("/api/me", async (req, response, next) => {
       uri: url,
       method: "GET",
     },
-    function (err, res, body) {
+    async function (err, res, body) {
       //console.log(res)
+      let me = JSON.parse(res.body)
+      let chicken = new Promise(function (resolve, reject) {
+        return resolve(me)
+      })
+      chicken.then((data) => {
+        console.log(data)
+        userId = data.id
+        console.log(userId)
+        response.send(data)
+      })
+    }
+  )
+})
+
+app.get("/api/recordings", async (req, response, next) => {
+  let userId = req.param.userId
+  let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-04-04`
+
+  request(
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      uri: url,
+      method: "GET",
+    },
+    async function (err, res, body) {
+      console.log(res)
       response.send(res)
     }
   )
