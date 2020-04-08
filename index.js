@@ -50,6 +50,8 @@ const clientSecret = "2s0yXD5CXj3Sm49GCxUOxJTeDPdFIdyc"
 const redirectURL =
   process.env.redirectURL || "https://client-transcipture.herokuapp.com/"
 let accessToken
+let userId
+let test
 
 // Put all API endpoints under '/api'
 // app.get('/*', (req, res) => {
@@ -80,19 +82,50 @@ app.post("/api/auth", (newreq, response) => {
         uri: url,
         method: "POST",
       },
-      function (err, res, body) {
+      async function (err, res, body) {
         //it works!
         //console.log(res)
         accessToken = JSON.parse(res.body).access_token
-        console.log(accessToken)
-        response.send(accessToken)
+        test = new Promise(function (resolve, reject) {
+          return resolve(accessToken)
+        })
+        test.then((data) => {
+          response.send(data)
+        })
       }
     )
   }
 })
 
-app.get("/api/me", (req, response, next) => {
+app.get("/api/me", async (req, response, next) => {
   let url = "https://api.zoom.us/v2/users/me"
+  request(
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      uri: url,
+      method: "GET",
+    },
+    async function (err, res, body) {
+      //console.log(res)
+      let me = JSON.parse(res.body)
+      let chicken = new Promise(function (resolve, reject) {
+        return resolve(me)
+      })
+      chicken.then((data) => {
+        console.log(data)
+        userId = data.id
+        console.log(userId)
+        response.send(data)
+      })
+    }
+  )
+})
+
+app.get("/api/recordings", async (req, response, next) => {
+  let userId = req.param.userId
+  let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-04-04`
 
   request(
     {
@@ -102,8 +135,8 @@ app.get("/api/me", (req, response, next) => {
       uri: url,
       method: "GET",
     },
-    function (err, res, body) {
-      //console.log(res)
+    async function (err, res, body) {
+      console.log(res)
       response.send(res)
     }
   )
