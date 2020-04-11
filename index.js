@@ -141,26 +141,9 @@ const bucket = "trans-audiofiles";
 const audioFile = "./testResources/BROOK.wav";
 google
   .uploadToBucket(bucket, audioFile)
-  .then(() => google.transcribe(`gs://${bucket}/${audioFile.split("/").pop()}`))
-  // .then(() => google.getFiles(bucket))
-  // .then(() => google.isThere(bucket, audioFile))
-  .catch(console.error);
-
-// .then(() =>
-//   google.transcribe(
-//     `gs://${bucket}/${audioFile.split("/").pop()}`,
-//     "LINEAR16",
-//     16000,
-//     "en-US"
-//   )
-// );
-// google.transcribe(
-//   `gs://${bucket}/${audioFile.split("/").pop()}`,
-//   "LINEAR16",
-//   16000,
-//   "en-US"
-// );
-//google.transcribe("gs://trans-audiofiles/brooklyn.wav");
+  .then(() =>
+    google.transcribe(`gs://${bucket}/${audioFile.split("/").pop()}`)
+  );
 
 app.get("/api/recordings", async (req, response, next) => {
   let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-01-01?to=2020-04-07`;
