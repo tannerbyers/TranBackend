@@ -1,16 +1,18 @@
-const express = require("express");
-const path = require("path");
-const bodyParser = require("body-parser");
-const app = express();
-const request = require("request");
-const https = require("https");
-const fs = require("fs");
-const db = require("./db.js");
-const google = require("./Google.js");
+const express = require("express")
+const path = require("path")
+const bodyParser = require("body-parser")
+const app = express()
+const request = require("request")
+const https = require("https")
+const fs = require("fs")
+const db = require("./db.js")
+const MongoClient = require("mongodb").MongoClient
 
-//console.log(process.env)
+const uri =
+  "mongodb+srv://joemama:gogogo@transcripturecluster-dan2o.mongodb.net/test?retryWrites=true&w=majority"
 
-db.sync();
+console.log(process.env)
+
 
 app.use(
   bodyParser.urlencoded({
@@ -57,10 +59,14 @@ app.use(function (req, res, next) {
 const clientID = "wvaVD6itTme4P9YBmPMZkg";
 const clientSecret = "2s0yXD5CXj3Sm49GCxUOxJTeDPdFIdyc";
 const redirectURL =
-  process.env.redirectURL || "https://client-transcipture.herokuapp.com/";
-let accessToken;
-let userId;
-let OauthPromise;
+
+process.env.redirectURL || "https://client-transcipture.herokuapp.com/"
+let accessToken
+let userAuthCode
+let userId
+let OauthPromise
+let database, collectionUsers, collectionTranscriptions
+
 
 // Put all API endpoints under '/api'
 // app.get('/*', (req, res) => {
@@ -70,7 +76,8 @@ let OauthPromise;
 
 app.post("/api/auth", (newreq, response) => {
   // Return them as json
-  console.log("Code Received", newreq.body.code);
+  console.log("Code Received", newreq.body.code)
+  userAuthCode = newreq.body.code
 
   if (newreq.body.code) {
     // Step 3:
@@ -99,13 +106,35 @@ app.post("/api/auth", (newreq, response) => {
           return resolve(accessToken);
         });
         OauthPromise.then((data) => {
-          console.log("Oauth token : ", data);
-          response.send(data);
-        });
+          console.log("Oauth token : ", data)
+          collectionUsers.insertOne(
+            {
+              name: "nut",
+              userAuthCode: userAuthCode,
+              accessToken: data,
+            },
+            (error, result) => {
+              if (error) {
+                console.log(error)
+              }
+              console.log(result)
+            }
+          )
+          response.send(data)
+        })
       }
     );
   }
 });
+
+app.get("/api/token", async (req, res, next) => {
+  collectionUsers.findOne({ userAuthCode: userAuthCode }, (error, result) => {
+    if (error) {
+      console.log(error)
+    }
+    res.send(result)
+  })
+})
 
 app.get("/api/me", async (req, response, next) => {
   let url = "https://api.zoom.us/v2/users/me";
@@ -126,11 +155,12 @@ app.get("/api/me", async (req, response, next) => {
         return resolve(me);
       });
       userDataPromise.then((data) => {
-        console.log(data);
-        userId = data.id;
-        console.log(userId);
-        response.send(data);
-      });
+        console.log(data)
+        userId = data.id
+        console.log(userId)
+
+        response.send(data)
+      })
     }
   );
 });
@@ -165,7 +195,21 @@ app.get("/api/recordings", async (req, response, next) => {
   );
 });
 
-const port = process.env.PORT || 5000;
-app.listen(port);
+const port = process.env.PORT || 5000
+app.listen(port, () => {
+  MongoClient.connect(
+    uri,
+    { useNewUrlParser: true, useUnifiedTopology: true },
+    (error, client) => {
+      if (error) {
+        throw error
+      }
+      database = client.db("transcripture")
+      collectionUsers = database.collection("users")
+      collectionTranscriptions = database.collection("transcriptions")
+    }
+  )
+})
+
 
 console.log(`Server listening on ${port}`);
