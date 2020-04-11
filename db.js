@@ -1,7 +1,16 @@
 const MongoClient = require("mongodb").MongoClient
 const uri =
   "mongodb+srv://joemama:gogogo@transcripturecluster-dan2o.mongodb.net/test?retryWrites=true&w=majority"
-const client = new MongoClient(uri, { useNewUrlParser: true })
+const client = new MongoClient(
+  uri,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  (err) => {
+    err && console.log(err)
+  }
+)
 
 /* Transcription Document Template
 {
@@ -11,20 +20,13 @@ const client = new MongoClient(uri, { useNewUrlParser: true })
     }
 */
 
-const sync = async () => {
+const sync = async (user) => {
   try {
     // Connect to the MongoDB cluster
     await client.connect()
 
     // Make the appropriate DB calls
-    await listDatabases(client)
-    await createTranscription(client, {
-      userAuthCode: "mama",
-      transcriptionFilePath: "./transcriptions/02.txt",
-      ancestors: ["root"],
-    })
-    await transcriptionSearch(client, "mama")
-    await userSearch(client, "mama")
+    await createUser(client, user)
   } catch (e) {
     console.error(e)
   } finally {
@@ -65,6 +67,13 @@ const userSearch = async (client, authCode) => {
   } else {
     console.log("No users with authCode provided")
   }
+}
+
+const createUser = async (client, user) => {
+  result = await client.db("transcripture").collection("users").insertOne(user)
+  console.log(
+    `New listing created with the following authCode: ${result.userAuthCode}`
+  )
 }
 
 const createTranscription = async (client, transcription) => {
