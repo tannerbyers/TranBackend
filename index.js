@@ -1,12 +1,16 @@
-const express = require("express");
-const path = require("path");
-const bodyParser = require("body-parser");
-const app = express();
-const request = require("request");
-const https = require("https");
-const fs = require("fs");
+const express = require("express")
+const path = require("path")
+const bodyParser = require("body-parser")
+const app = express()
+const request = require("request")
+const https = require("https")
+const fs = require("fs")
+const db = require("./db.js")
+
 
 //console.log(process.env)
+
+db.sync()
 
 app.use(
   bodyParser.urlencoded({
@@ -95,6 +99,7 @@ app.post("/api/auth", (newreq, response) => {
           return resolve(accessToken);
         });
         OauthPromise.then((data) => {
+          console.log("Oauth token : ", data)
           response.send(data);
         });
       }
@@ -103,7 +108,10 @@ app.post("/api/auth", (newreq, response) => {
 });
 
 app.get("/api/me", async (req, response, next) => {
-  let url = "https://api.zoom.us/v2/users/me";
+  let url = "https://api.zoom.us/v2/users/me"
+  console.log("me token : ", accessToken)
+
+
   request(
     {
       headers: {
@@ -129,8 +137,8 @@ app.get("/api/me", async (req, response, next) => {
 });
 
 app.get("/api/recordings", async (req, response, next) => {
-  let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-01-01?to=2020-04-07`;
-
+  let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-01-01?to=2020-04-07`
+  console.log("recording token : ", accessToken)
   request(
     {
       headers: {
@@ -140,10 +148,11 @@ app.get("/api/recordings", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-      console.log("Get Meetings Data Response", res);
+      console.log("Get Meetings Data Response", res)
       let firstFile = JSON.parse(res.body).meetings[0].recording_files[0]
-        .download_url;
-      response.send(firstFile);
+        .download_url
+      response.send(firstFile)
+
     }
   );
 });
