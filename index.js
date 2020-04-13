@@ -1,9 +1,10 @@
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
+const axios = require("axios");
 const app = express();
 const request = require("request");
-const https = require("https");
+const http = require("https");
 const fs = require("fs");
 const db = require("./db.js");
 const MongoClient = require("mongodb").MongoClient;
@@ -162,7 +163,7 @@ app.get("/api/me", async (req, response, next) => {
 // first arg is the name of Google Storage bucket
 // second is file being sent to the bucket
 
-// const bucket = "trans-audiofiles";
+const bucket = "trans-audiofiles";
 // const audioFile = "./testResources/BROOK.wav";
 // console.log("Transcription Called");
 // google
@@ -184,9 +185,31 @@ app.get("/api/recordings", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-      console.log("Get Meetings Data Response", res.body.ops);
-      let firstFile = JSON.parse(res.body).meetings[0].recording_files[0]
+      //console.log("Get Meetings Data Response", res.body.ops);
+      let firstFile = JSON.parse(res.body).meetings[0].recording_files[1]
         .download_url;
+
+      // get buffer
+      const getBase64 = async (meetingUrl) => {
+        try {
+          const result = await axios
+            .get(meetingUrl, {
+              responseType: "arraybuffer",
+            })
+            .then((response) =>
+              new Buffer.from(response.data, "binary").toString("base64")
+            );
+
+          return { data: result };
+        } catch (err) {
+          return { error: err };
+        }
+      };
+      let firstFileBase64;
+      getBase64(firstFile).then((response) =>
+        google.writeFile(bucket, "firstFile.m4a", response.data)
+      );
+      // .then(() => google.transcribe(`gs://${bucket}/firstFile.mp4`));
       response.send(firstFile);
     }
   );

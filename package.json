@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js",
     "start:dev": "set redirectURL=http://localhost:3000/ && nodemon index.js",
-    "start:dev:linux": "redirectURL=http://localhost:3000/ nodemon index.js"
+    "start:dev:linux": "redirectURL=http://localhost:3000/ GOOGLE_APPLICATION_CREDENTIALS=./config/privateKey.json nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
   "dependencies": {
     "@google-cloud/speech": "^3.6.0",
     "@google-cloud/storage": "^4.7.0",
+    "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mongodb": "^3.5.5",

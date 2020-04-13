@@ -3,9 +3,21 @@ const speech = require("@google-cloud/speech");
 const storage = new Storage();
 const client = new speech.SpeechClient();
 
+async function writeFile(bucketName, fileName, base64Buffer) {
+  const bucket = storage.bucket(bucketName);
+  const file = bucket.file(fileName);
+  const contents = base64Buffer;
+
+  file.save(contents, (err) => {
+    if (!err) {
+      console.log("success");
+    } else "Error: file not written";
+  });
+}
+
 async function uploadToBucket(bucketName, filename) {
   // Uploads a local file to the bucket
-  await storage.bucket(bucketName).upload(filename, {
+  await storage.bucket(bucketName).upload(fileName, {
     // Support for HTTP requests made with `Accept-Encoding: gzip`
     //gzip: true,
     // By setting the option `destination`, you can change the name of the
@@ -18,7 +30,7 @@ async function uploadToBucket(bucketName, filename) {
       cacheControl: "no-cache",
     },
   });
-  console.log(`${filename} uploaded to ${bucketName}.`);
+  console.log(`${fileName} uploaded to ${bucketName}.`);
 }
 
 async function getBuckets() {
@@ -75,6 +87,7 @@ async function transcribe(gcsUri) {
 }
 
 module.exports = {
+  writeFile,
   uploadToBucket,
   transcribe,
   isThere,
