@@ -162,15 +162,15 @@ app.get("/api/me", async (req, response, next) => {
 // first arg is the name of Google Storage bucket
 // second is file being sent to the bucket
 
-const bucket = "trans-audiofiles";
-const audioFile = "./testResources/BROOK.wav";
-console.log("Transcription Called");
-google
-  .uploadToBucket(bucket, audioFile)
-  .then(() =>
-    google.transcribe(`gs://${bucket}/${audioFile.split("/").pop()}`)
-  );
-console.log("Transcription Finished");
+// const bucket = "trans-audiofiles";
+// const audioFile = "./testResources/BROOK.wav";
+// console.log("Transcription Called");
+// google
+//   .uploadToBucket(bucket, audioFile)
+//   .then(() =>
+//     google.transcribe(`gs://${bucket}/${audioFile.split("/").pop()}`)
+//   );
+// console.log("Transcription Finished");
 
 app.get("/api/recordings", async (req, response, next) => {
   let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-01-01?to=2020-04-07`;
