@@ -1,38 +1,30 @@
-const express = require("express")
-const path = require("path")
-const bodyParser = require("body-parser")
-const app = express()
-const request = require("request")
-const https = require("https")
-const fs = require("fs")
-const db = require("./db.js")
-const MongoClient = require("mongodb").MongoClient
+const express = require("express");
+const path = require("path");
+const bodyParser = require("body-parser");
+const app = express();
+const request = require("request");
+const https = require("https");
+const fs = require("fs");
+const db = require("./db.js");
+const MongoClient = require("mongodb").MongoClient;
 const google = require("./Google.js");
 
-const uri =
-  "mongodb+srv://joemama:gogogo@transcripturecluster-dan2o.mongodb.net/test?retryWrites=true&w=majority"
-
-console.log(process.env)
-
+console.log("Server has started (not listening)");
+const MongoDBurl =
+  "mongodb+srv://joemama:gogogo@transcripturecluster-dan2o.mongodb.net/test?retryWrites=true&w=majority";
 
 app.use(
   bodyParser.urlencoded({
     extended: true,
   })
 );
-
 app.use(
   bodyParser.json({
     extended: true,
   })
 );
 
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
-
+// ALLOWS CORS
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -57,72 +49,72 @@ app.use(function (req, res, next) {
   next();
 });
 
-const clientID = "wvaVD6itTme4P9YBmPMZkg";
-const clientSecret = "2s0yXD5CXj3Sm49GCxUOxJTeDPdFIdyc";
 const redirectURL =
+  process.env.redirectURL || "https://client-transcipture.herokuapp.com/";
 
-process.env.redirectURL || "https://client-transcipture.herokuapp.com/"
-let accessToken
-let userAuthCode
-let userId
-let OauthPromise
-let database, collectionUsers, collectionTranscriptions
-
+let accessToken;
+let userAuthCode;
+let userId;
+let OauthPromise;
+let database, collectionUsers, collectionTranscriptions;
+const base64encodedClientIdAndSecret =
+  "d3ZhVkQ2aXRUbWU0UDlZQm1QTVprZzoyczB5WEQ1Q1hqM1NtNDlHQ3hVT3hKVGVEUGRGSWR5Yw==";
 
 // Put all API endpoints under '/api'
-// app.get('/*', (req, res) => {
-//   // Return them as json
-//   res.json({ Test: 'test' })
-// })
 
 app.post("/api/auth", (newreq, response) => {
-  // Return them as json
-  console.log("Code Received", newreq.body.code)
-  userAuthCode = newreq.body.code
+  console.log("Auth Code Received", newreq.body.code);
+  userAuthCode = newreq.body.code;
 
-  if (newreq.body.code) {
-    // Step 3:
-    // Request an access token using the auth code
-    let url =
+  if (userAuthCode) {
+    // Request an access token using the above user auth code
+    let AccessTokenRequestUrl =
       "https://zoom.us/oauth/token?grant_type=authorization_code&code=" +
       newreq.body.code +
       "&redirect_uri=" +
       redirectURL;
-    console.log("REQUEST URL", url);
 
     request(
       {
         headers: {
-          Authorization:
-            "Basic d3ZhVkQ2aXRUbWU0UDlZQm1QTVprZzoyczB5WEQ1Q1hqM1NtNDlHQ3hVT3hKVGVEUGRGSWR5Yw==",
+          Authorization: `Basic ${base64encodedClientIdAndSecret}`,
         },
-        uri: url,
+        uri: AccessTokenRequestUrl,
         method: "POST",
       },
       async function (err, res, body) {
-        //it works!
-        //console.log(res)
+        if (err) {
+          console.log("Error hit when requesting access token:", err);
+          return err;
+        }
         accessToken = JSON.parse(res.body).access_token;
+        console.log("Access token received: ", accessToken);
+
         OauthPromise = new Promise(function (resolve, reject) {
           return resolve(accessToken);
         });
+
         OauthPromise.then((data) => {
-          console.log("Oauth token : ", data)
+          console.log("Oauth Access token : ", data);
           collectionUsers.insertOne(
             {
-              name: "nut",
+              name: "test user",
               userAuthCode: userAuthCode,
               accessToken: data,
             },
             (error, result) => {
               if (error) {
-                console.log(error)
+                console.log("Error adding user", error);
               }
-              console.log(result)
+              console.log("result of adding user:", result.ops[0]);
             }
-          )
-          response.send(data)
-        })
+          );
+          if (accessToken) {
+            response.send("New Access token received");
+          } else {
+            response.send("New Accses token issue. Check backend logs");
+          }
+        });
       }
     );
   }
@@ -131,12 +123,13 @@ app.post("/api/auth", (newreq, response) => {
 app.get("/api/token", async (req, res, next) => {
   collectionUsers.findOne({ userAuthCode: userAuthCode }, (error, result) => {
     if (error) {
-      console.log(error)
+      console.log("Error getting new token", error);
     }
-    res.send(result)
-  })
-})
+    res.send("New Token Received", result);
+  });
+});
 
+// This is not currently being used. Not sure if it works properly
 app.get("/api/me", async (req, response, next) => {
   let url = "https://api.zoom.us/v2/users/me";
   console.log("me token : ", accessToken);
@@ -156,29 +149,32 @@ app.get("/api/me", async (req, response, next) => {
         return resolve(me);
       });
       userDataPromise.then((data) => {
-        console.log(data)
-        userId = data.id
-        console.log(userId)
+        console.log(data);
+        userId = data.id;
+        console.log(userId);
 
-        response.send(data)
-      })
+        response.send(data);
+      });
     }
   );
 });
 
 // first arg is the name of Google Storage bucket
 // second is file being sent to the bucket
+
 const bucket = "trans-audiofiles";
 const audioFile = "./testResources/BROOK.wav";
+console.log("Transcription Called");
 google
   .uploadToBucket(bucket, audioFile)
   .then(() =>
     google.transcribe(`gs://${bucket}/${audioFile.split("/").pop()}`)
   );
+console.log("Transcription Finished");
 
 app.get("/api/recordings", async (req, response, next) => {
   let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-01-01?to=2020-04-07`;
-  console.log("recording token : ", accessToken);
+  console.log("access token : ", accessToken);
   request(
     {
       headers: {
@@ -188,7 +184,7 @@ app.get("/api/recordings", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-      console.log("Get Meetings Data Response", res);
+      console.log("Get Meetings Data Response", res.body.ops);
       let firstFile = JSON.parse(res.body).meetings[0].recording_files[0]
         .download_url;
       response.send(firstFile);
@@ -196,21 +192,20 @@ app.get("/api/recordings", async (req, response, next) => {
   );
 });
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
   MongoClient.connect(
-    uri,
+    MongoDBurl,
     { useNewUrlParser: true, useUnifiedTopology: true },
     (error, client) => {
       if (error) {
-        throw error
+        throw error;
       }
-      database = client.db("transcripture")
-      collectionUsers = database.collection("users")
-      collectionTranscriptions = database.collection("transcriptions")
+      database = client.db("transcripture");
+      collectionUsers = database.collection("users");
+      collectionTranscriptions = database.collection("transcriptions");
     }
-  )
-})
-
+  );
+});
 
 console.log(`Server listening on ${port}`);

@@ -18,7 +18,6 @@ async function uploadToBucket(bucketName, filename) {
       cacheControl: "no-cache",
     },
   });
-
   console.log(`${filename} uploaded to ${bucketName}.`);
 }
 
