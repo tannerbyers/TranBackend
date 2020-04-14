@@ -71,7 +71,7 @@ async function transcribe(gcsUri) {
   const transcription = response.results
     .map((result) => result.alternatives[0].transcript)
     .join("\n");
-  console.log(`Transcription: ${transcription}`);
+    return transcription
 }
 
 module.exports = {

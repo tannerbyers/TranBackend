@@ -3,11 +3,13 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const app = express();
 const request = require("request");
+//.defaults({ encoding: null });
 const https = require("https");
 const fs = require("fs");
 const db = require("./db.js");
 const MongoClient = require("mongodb").MongoClient;
 const google = require("./Google.js");
+const linear16 = require("linear16");
 
 console.log("Server has started (not listening)");
 const MongoDBurl =
@@ -159,19 +161,6 @@ app.get("/api/me", async (req, response, next) => {
   );
 });
 
-// first arg is the name of Google Storage bucket
-// second is file being sent to the bucket
-
-const bucket = "trans-audiofiles";
-const audioFile = "./testResources/BROOK.wav";
-console.log("Transcription Called");
-google
-  .uploadToBucket(bucket, audioFile)
-  .then(() =>
-    google.transcribe(`gs://${bucket}/${audioFile.split("/").pop()}`)
-  );
-console.log("Transcription Finished");
-
 app.get("/api/recordings", async (req, response, next) => {
   let url = `https://api.zoom.us/v2/users/me/recordings?from=2020-01-01?to=2020-04-07`;
   console.log("access token : ", accessToken);
@@ -185,9 +174,35 @@ app.get("/api/recordings", async (req, response, next) => {
     },
     async function (err, res, body) {
       console.log("Get Meetings Data Response", res.body.ops);
-      let firstFile = JSON.parse(res.body).meetings[0].recording_files[0]
+      let firstFile = JSON.parse(res.body).meetings[0].recording_files[1]
         .download_url;
-      response.send(firstFile);
+
+      var file = fs.createWriteStream("test.m4a");
+      console.log("FirstFile", firstFile);
+
+      request(firstFile).pipe(file);
+
+      file.on("finish", () => {
+        (async () => {
+          const outPath = await linear16("./test.m4a", "./output.wav");
+          console.log(outPath); // Returns the output path, ex: ./output.wav
+          const bucket = "trans-audiofiles";
+          const audioFile = "./output.wav";
+          console.log("Transcription Called");
+          google
+            .uploadToBucket(bucket, audioFile)
+            .then(() => {
+              return google.transcribe(
+                `gs://${bucket}/${audioFile.split("/").pop()}`
+              );
+            })
+            .then((result) => {
+              response.send({ filePath: firstFile, transcription: result });
+            });
+          console.log("Transcription Finished");
+        })();
+        console.log("finished");
+      });
     }
   );
 });
