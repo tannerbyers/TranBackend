@@ -215,6 +215,17 @@ app.get("/api/db/transcripts", async (req, res, next) => {
   })
 })
 
+const uploadTransToDB = (transArray) => {
+  transArray.forEach((transcript) => {
+    collectionTranscriptions.insertOne(transcript, (error, result) => {
+      if (error) {
+        console.log(error)
+      }
+      console.log("uploaded transcript : ", result)
+    })
+  })
+}
+
 const port = process.env.PORT || 5000
 app.listen(port, () => {
   MongoClient.connect(
