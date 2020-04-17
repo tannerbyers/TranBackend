@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js",
-    "start:dev": "set redirectURL=http://localhost:3000/ && nodemon index.js",
+    "start:dev": "set GOOGLE_APPLICATION_CREDENTIALS=C:/Users/awks/Desktop/Projects/TranBackend/config/privateKey.json&& set redirectURL=http://localhost:3000/ && nodemon index.js",
     "start:dev:linux": "GOOGLE_APPLICATION_CREDENTIALS=./config/privateKey.json redirectURL=http://localhost:3000/ nodemon index"
   },
   "keywords": [],
