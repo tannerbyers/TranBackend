@@ -4,6 +4,7 @@ const storage = new Storage();
 const client = new speech.SpeechClient();
 
 async function uploadToBucket(bucketName, filename) {
+  console.log("upload to bucket requested")
   // Uploads a local file to the bucket
   await storage.bucket(bucketName).upload(filename, {
     // Support for HTTP requests made with `Accept-Encoding: gzip`
