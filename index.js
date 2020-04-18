@@ -181,38 +181,62 @@ app.get("/api/recordings", async (req, response, next) => {
 
       console.log(videoUrls.length);
       let arrayOfAudioPathAndTranscriptionPath = [];
-      for (let i = 0; i < videoUrls.length; i++) {
-        console.log("we're starting the transcription");
 
-        let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
+        for (let i = 0; i < videoUrls.length; i++) {
+          console.log("we're starting the transcription");
 
-        request(videoUrls[i].recording_files[1].download_url).pipe(file);
+          let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
 
-        file.on("finish", () => {
-            console.log("does this ever finish?")            
+          request(videoUrls[i].recording_files[1].download_url).pipe(file);
+
+          file.on("finish", async () => {
+            console.log("does this ever finish?");
             const outPath = linear16(
               `./ZoomMedia/testfile${[i]}.m4a`,
               `./ConvertedMedia/testfile${[i]}.wav`
             );
-            console.log("outpath", outPath); // Returns the output path, ex: ./output.wav
             const bucket = "trans-audiofiles";
             const audioFile = `./ConvertedMedia/testfile${[i]}.wav`;
             console.log("Transcription Called");
-            google.uploadToBucket(bucket, audioFile).then(() => { 
+            google
+              .uploadToBucket(bucket, audioFile)
+              .then(async () => {
                 let transcript = google.transcribe(
                   `gs://${bucket}/${audioFile.split("/").pop()}`
-              );
-              return transcript
-            }).then((result) => {
-              fs.writeFile(`./ConvertedMedia/testfile${[i]}.txt`, result, function (err) {
-                arrayOfAudioPathAndTranscriptionPath.push({transcriptionFilePath: `./ConvertedMedia/testfile${[i]}.txt`, videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`})
-                if (err) throw err;
-                console.log(`./ConvertedMedia/testfile${[i]}.txt is created successfully.`);
-              }); 
-            })
-        });
-      }
-      // For Loop ends
+                );
+                return await transcript;
+              })
+              .then((result) => {
+                fs.writeFile(
+                  `./ConvertedMedia/testfile${[i]}.txt`,
+                  result,
+                  function (err) {
+                    arrayOfAudioPathAndTranscriptionPath.push({
+                      transcriptionFilePath: `./ConvertedMedia/testfile${[
+                        i,
+                      ]}.txt`,
+                      videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
+                    });
+                    if (arrayOfAudioPathAndTranscriptionPath.length === videoUrls.length){
+                      console.log("did this finish?")
+                      response.send(arrayOfAudioPathAndTranscriptionPath)
+                    }
+                    else {
+                      console.log("arrayOfAudioPathAndTranscriptionPath", arrayOfAudioPathAndTranscriptionPath.length)
+                      console.log("videoUrls.length", videoUrls.length)
+                    }
+                    if (err) throw err;
+                    console.log(
+                      `./ConvertedMedia/testfile${[
+                        i,
+                      ]}.txt is created successfully.`
+                    );
+                  }
+                );
+              });
+          });
+        // For Loop ends
+      };
     }
   );
 });
