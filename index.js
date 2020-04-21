@@ -270,6 +270,19 @@ app.post("/api/db/folders", async (req, res, next) => {
   collectionFolders.replaceOne({}, folders)
 })
 
+app.post("/api/db/transcripts", async (req, res, next) => {
+  const match = req.body.transcriptionFilePath
+  const update = req.body.newAncestors
+  collectionFolders
+    .updateOne(
+      { transcriptionFilePath: req.body.transcriptionFilePath },
+      { ancestors: req.body.newAncestors }
+    )
+    .then((result) => {
+      console.log(result)
+    })
+})
+
 const uploadTransToDB = (transArray, index) => {
   transArray.forEach((transcript) => {
     collectionTranscriptions.update(
