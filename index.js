@@ -272,12 +272,17 @@ app.post("/api/db/folders", async (req, res, next) => {
 
 const uploadTransToDB = (transArray, index) => {
   transArray.forEach((transcript) => {
-    collectionTranscriptions.insertOne(transcript, (error, result) => {
-      if (error) {
-        console.log(error)
+    collectionTranscriptions.update(
+      transcript,
+      transcript,
+      { upsert: true },
+      (error, result) => {
+        if (error) {
+          console.log(error)
+        }
+        //Do stuff here
       }
-      //Do stuff here
-    })
+    )
   })
 }
 
