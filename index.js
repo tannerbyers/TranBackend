@@ -17,13 +17,13 @@ const MongoDBurl =
 
 app.use(
   bodyParser.urlencoded({
-    extended: true,
-  }),
+    extended: true
+  })
 );
 app.use(
   bodyParser.json({
-    extended: true,
-  }),
+    extended: true
+  })
 );
 
 // ALLOWS CORS
@@ -34,13 +34,13 @@ app.use(function (req, res, next) {
   // Request methods you wish to allow
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
   );
 
   // Request headers you wish to allow
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type",
+    "X-Requested-With,content-type"
   );
 
   // Set to true if you need the website to include cookies in the requests sent
@@ -80,10 +80,10 @@ app.post("/api/auth", (newreq, response) => {
     request(
       {
         headers: {
-          Authorization: `Basic ${base64encodedClientIdAndSecret}`,
+          Authorization: `Basic ${base64encodedClientIdAndSecret}`
         },
         uri: AccessTokenRequestUrl,
-        method: "POST",
+        method: "POST"
       },
       async function (err, res, body) {
         if (err) {
@@ -118,7 +118,7 @@ app.post("/api/auth", (newreq, response) => {
             response.send("New Accses token issue. Check backend logs");
           }
         });
-      },
+      }
     );
   }
 });
@@ -140,10 +140,10 @@ app.get("/api/me", async (req, response, next) => {
   request(
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`
       },
       uri: url,
-      method: "GET",
+      method: "GET"
     },
     async function (err, res, body) {
       //console.log(res)
@@ -158,7 +158,7 @@ app.get("/api/me", async (req, response, next) => {
 
         response.send(data);
       });
-    },
+    }
   );
 });
 
@@ -168,10 +168,10 @@ app.get("/api/recordings", async (req, response, next) => {
   request(
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`
       },
       uri: url,
-      method: "GET",
+      method: "GET"
     },
     async function (err, res, body) {
       console.log("Get Meetings Data Response", res.body.ops);
@@ -194,7 +194,7 @@ app.get("/api/recordings", async (req, response, next) => {
           console.log("does this ever finish?");
           const outPath = linear16(
             `./ZoomMedia/testfile${[i]}.m4a`,
-            `./ConvertedMedia/testfile${[i]}.wav`,
+            `./ConvertedMedia/testfile${[i]}.wav`
           );
           const bucket = "trans-audiofiles";
           const audioFile = `./ConvertedMedia/testfile${[i]}.wav`;
@@ -203,7 +203,7 @@ app.get("/api/recordings", async (req, response, next) => {
             .uploadToBucket(bucket, audioFile)
             .then(async () => {
               let transcript = google.transcribe(
-                `gs://${bucket}/${audioFile.split("/").pop()}`,
+                `gs://${bucket}/${audioFile.split("/").pop()}`
               );
               return await transcript;
             })
@@ -214,10 +214,10 @@ app.get("/api/recordings", async (req, response, next) => {
                 function (err) {
                   arrayOfAudioPathAndTranscriptionPath.push({
                     transcriptionFilePath: `./ConvertedMedia/testfile${[
-                      i,
+                      i
                     ]}.txt`,
                     videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
-                    ancestors: ["Home"],
+                    ancestors: ["Home"]
                   });
                   if (
                     arrayOfAudioPathAndTranscriptionPath.length ===
@@ -229,24 +229,24 @@ app.get("/api/recordings", async (req, response, next) => {
                   } else {
                     console.log(
                       "arrayOfAudioPathAndTranscriptionPath",
-                      arrayOfAudioPathAndTranscriptionPath.length,
+                      arrayOfAudioPathAndTranscriptionPath.length
                     );
                     console.log("videoUrls.length", videoUrls.length);
                   }
                   if (err) throw err;
                   console.log(
                     `./ConvertedMedia/testfile${[
-                      i,
-                    ]}.txt is created successfully.`,
+                      i
+                    ]}.txt is created successfully.`
                   );
-                },
+                }
               );
             });
         });
         // For Loop ends
         console.log("ITS OVER BABY");
       }
-    },
+    }
   );
 });
 
@@ -285,7 +285,7 @@ app.post("/api/db/transcripts", async (req, res, next) => {
   collectionFolders
     .updateOne(
       { transcriptionFilePath: req.body.transcriptionFilePath },
-      { ancestors: req.body.newAncestors },
+      { ancestors: req.body.newAncestors }
     )
     .then((result) => {
       console.log(result);
@@ -303,7 +303,7 @@ const uploadTransToDB = (transArray, index) => {
           console.log(error);
         }
         //Do stuff here
-      },
+      }
     );
   });
 };
@@ -321,7 +321,7 @@ app.listen(port, () => {
       collectionUsers = database.collection("users");
       collectionTranscriptions = database.collection("transcriptions");
       collectionFolders = database.collection("folders");
-    },
+    }
   );
 });
 
