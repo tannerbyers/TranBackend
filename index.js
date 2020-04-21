@@ -275,6 +275,7 @@ app.post("/api/db/folders", async (req, res, next) => {
 
 const uploadTransToDB = (transArray, index) => {
   transArray.forEach((transcript) => {
+<<<<<<< HEAD
     collectionTranscriptions.insertOne(transcript, (error, result) => {
       if (error) {
         console.log(error);
@@ -283,6 +284,21 @@ const uploadTransToDB = (transArray, index) => {
     });
   });
 };
+=======
+    collectionTranscriptions.update(
+      transcript,
+      transcript,
+      { upsert: true },
+      (error, result) => {
+        if (error) {
+          console.log(error)
+        }
+        //Do stuff here
+      }
+    )
+  })
+}
+>>>>>>> master
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
