@@ -17,12 +17,12 @@ const MongoDBurl =
 
 app.use(
   bodyParser.urlencoded({
-    extended: true,
+    extended: true
   })
 );
 app.use(
   bodyParser.json({
-    extended: true,
+    extended: true
   })
 );
 
@@ -80,10 +80,10 @@ app.post("/api/auth", (newreq, response) => {
     request(
       {
         headers: {
-          Authorization: `Basic ${base64encodedClientIdAndSecret}`,
+          Authorization: `Basic ${base64encodedClientIdAndSecret}`
         },
         uri: AccessTokenRequestUrl,
-        method: "POST",
+        method: "POST"
       },
       async function (err, res, body) {
         if (err) {
@@ -140,10 +140,10 @@ app.get("/api/me", async (req, response, next) => {
   request(
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`
       },
       uri: url,
-      method: "GET",
+      method: "GET"
     },
     async function (err, res, body) {
       //console.log(res)
@@ -168,15 +168,13 @@ app.get("/api/recordings", async (req, response, next) => {
   request(
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`
       },
       uri: url,
-      method: "GET",
+      method: "GET"
     },
     async function (err, res, body) {
       console.log("Get Meetings Data Response", res.body.ops);
-      //let firstFile = JSON.parse(res.body).meetings[0].recording_files[1]
-      //.download_url
 
       let videoUrls = JSON.parse(res.body).meetings;
 
@@ -214,11 +212,12 @@ app.get("/api/recordings", async (req, response, next) => {
                 function (err) {
                   arrayOfAudioPathAndTranscriptionPath.push({
                     transcriptionFilePath: `./ConvertedMedia/testfile${[
-                      i,
+                      i
                     ]}.txt`,
                     videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
-                    content: result,
-                    ancestors: ["Home"],
+
+                    ancestors: ["Home"]
+
                   });
                   if (
                     arrayOfAudioPathAndTranscriptionPath.length ===
@@ -237,7 +236,7 @@ app.get("/api/recordings", async (req, response, next) => {
                   if (err) throw err;
                   console.log(
                     `./ConvertedMedia/testfile${[
-                      i,
+                      i
                     ]}.txt is created successfully.`
                   );
                 }
@@ -252,10 +251,18 @@ app.get("/api/recordings", async (req, response, next) => {
 });
 
 app.get("/api/db/transcripts", async (req, res, next) => {
-  collectionTranscriptions
+  let fo = [];
+  await collectionTranscriptions
     .find({})
     .toArray()
-    .then((results) => res.send(results));
+
+    .then(async (results) => {
+      results.forEach((transcript) => {
+        let content = fs.readFileSync(transcript.transcriptionFilePath, "utf8");
+        transcript.content = content;
+      });
+      res.send(results);
+    });
 });
 
 app.get("/api/db/folders", async (req, res, next) => {
@@ -274,21 +281,21 @@ app.post("/api/db/folders", async (req, res, next) => {
 });
 
 app.post("/api/db/transcripts", async (req, res, next) => {
-  const match = req.body.transcriptionFilePath
-  const update = req.body.newAncestors
+  const match = req.body.transcriptionFilePath;
+  const update = req.body.newAncestors;
   collectionFolders
     .updateOne(
       { transcriptionFilePath: req.body.transcriptionFilePath },
       { ancestors: req.body.newAncestors }
     )
     .then((result) => {
-      console.log(result)
-    })
-})
+      console.log(result);
+    });
+});
 
 const uploadTransToDB = (transArray, index) => {
   transArray.forEach((transcript) => {
-<<<<<<< HEAD
+
     collectionTranscriptions.insertOne(transcript, (error, result) => {
       if (error) {
         console.log(error);
@@ -297,21 +304,25 @@ const uploadTransToDB = (transArray, index) => {
     });
   });
 };
-=======
+
     collectionTranscriptions.update(
       transcript,
       transcript,
       { upsert: true },
       (error, result) => {
         if (error) {
-          console.log(error)
+          console.log(error);
         }
         //Do stuff here
       }
+
+    );
+  });
+};
+
     )
   })
 }
->>>>>>> master
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
