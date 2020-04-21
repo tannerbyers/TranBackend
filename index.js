@@ -175,8 +175,6 @@ app.get("/api/recordings", async (req, response, next) => {
     },
     async function (err, res, body) {
       console.log("Get Meetings Data Response", res.body.ops);
-      let firstFile = JSON.parse(res.body).meetings[0].recording_files[1]
-        .download_url;
 
       let videoUrls = JSON.parse(res.body).meetings;
 
@@ -217,7 +215,9 @@ app.get("/api/recordings", async (req, response, next) => {
                       i
                     ]}.txt`,
                     videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
+
                     ancestors: ["Home"]
+
                   });
                   if (
                     arrayOfAudioPathAndTranscriptionPath.length ===
@@ -255,6 +255,7 @@ app.get("/api/db/transcripts", async (req, res, next) => {
   await collectionTranscriptions
     .find({})
     .toArray()
+
     .then(async (results) => {
       results.forEach((transcript) => {
         let content = fs.readFileSync(transcript.transcriptionFilePath, "utf8");
@@ -294,6 +295,16 @@ app.post("/api/db/transcripts", async (req, res, next) => {
 
 const uploadTransToDB = (transArray, index) => {
   transArray.forEach((transcript) => {
+
+    collectionTranscriptions.insertOne(transcript, (error, result) => {
+      if (error) {
+        console.log(error);
+      }
+      //Do stuff here
+    });
+  });
+};
+
     collectionTranscriptions.update(
       transcript,
       transcript,
@@ -304,9 +315,14 @@ const uploadTransToDB = (transArray, index) => {
         }
         //Do stuff here
       }
+
     );
   });
 };
+
+    )
+  })
+}
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
