@@ -214,7 +214,6 @@ app.get("/api/recordings", async (req, response, next) => {
                       i,
                     ]}.txt`,
                     videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
-                    content: result,
                     ancestors: ["Home"],
                   })
                   if (
@@ -249,10 +248,17 @@ app.get("/api/recordings", async (req, response, next) => {
 })
 
 app.get("/api/db/transcripts", async (req, res, next) => {
-  collectionTranscriptions
+  let fo = []
+  await collectionTranscriptions
     .find({})
     .toArray()
-    .then((results) => res.send(results))
+    .then(async (results) => {
+      results.forEach((transcript) => {
+        let content = fs.readFileSync(transcript.transcriptionFilePath, "utf8")
+        transcript.content = content
+      })
+      res.send(results)
+    })
 })
 
 app.get("/api/db/folders", async (req, res, next) => {
