@@ -17,12 +17,12 @@ const MongoDBurl =
 
 app.use(
   bodyParser.urlencoded({
-    extended: true
+    extended: true,
   })
 );
 app.use(
   bodyParser.json({
-    extended: true
+    extended: true,
   })
 );
 
@@ -80,10 +80,10 @@ app.post("/api/auth", (newreq, response) => {
     request(
       {
         headers: {
-          Authorization: `Basic ${base64encodedClientIdAndSecret}`
+          Authorization: `Basic ${base64encodedClientIdAndSecret}`,
         },
         uri: AccessTokenRequestUrl,
-        method: "POST"
+        method: "POST",
       },
       async function (err, res, body) {
         if (err) {
@@ -140,10 +140,10 @@ app.get("/api/me", async (req, response, next) => {
   request(
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`,
       },
       uri: url,
-      method: "GET"
+      method: "GET",
     },
     async function (err, res, body) {
       //console.log(res)
@@ -168,10 +168,10 @@ app.get("/api/recordings", async (req, response, next) => {
   request(
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`,
       },
       uri: url,
-      method: "GET"
+      method: "GET",
     },
     async function (err, res, body) {
       console.log("Get Meetings Data Response", res.body.ops);
@@ -212,12 +212,11 @@ app.get("/api/recordings", async (req, response, next) => {
                 function (err) {
                   arrayOfAudioPathAndTranscriptionPath.push({
                     transcriptionFilePath: `./ConvertedMedia/testfile${[
-                      i
+                      i,
                     ]}.txt`,
                     videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
 
-                    ancestors: ["Home"]
-
+                    ancestors: ["Home"],
                   });
                   if (
                     arrayOfAudioPathAndTranscriptionPath.length ===
@@ -236,7 +235,7 @@ app.get("/api/recordings", async (req, response, next) => {
                   if (err) throw err;
                   console.log(
                     `./ConvertedMedia/testfile${[
-                      i
+                      i,
                     ]}.txt is created successfully.`
                   );
                 }
@@ -295,16 +294,6 @@ app.post("/api/db/transcripts", async (req, res, next) => {
 
 const uploadTransToDB = (transArray, index) => {
   transArray.forEach((transcript) => {
-
-    collectionTranscriptions.insertOne(transcript, (error, result) => {
-      if (error) {
-        console.log(error);
-      }
-      //Do stuff here
-    });
-  });
-};
-
     collectionTranscriptions.update(
       transcript,
       transcript,
@@ -315,14 +304,9 @@ const uploadTransToDB = (transArray, index) => {
         }
         //Do stuff here
       }
-
     );
   });
 };
-
-    )
-  })
-}
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
