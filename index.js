@@ -180,7 +180,7 @@ app.get("/api/recordings", async (req, response, next) => {
 
       let videoUrls = JSON.parse(res.body).meetings;
 
-      console.log(videoUrls.length);
+      console.log(videoUrls);
       arrayOfAudioPathAndTranscriptionPath = [];
 
       for (let i = 0; i < videoUrls.length; i++) {
@@ -218,6 +218,9 @@ app.get("/api/recordings", async (req, response, next) => {
                     ]}.txt`,
                     videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
                     ancestors: ["Home"],
+                    recordingDate: videoUrls[i]["start_time"],
+                    duration: videoUrls[i].duration,
+                    name: `./ConvertedMedia/testfile${[i]}.txt`,
                   });
                   if (
                     arrayOfAudioPathAndTranscriptionPath.length ===
@@ -284,11 +287,9 @@ app.post("/api/db/transcripts", async (req, res, next) => {
   const update = req.body.newAncestors;
   collectionTranscriptions
     .update(
-      { transcriptionFilePath: req.body.transcriptionFilePath },
+      { transcriptionFilePath: match },
       {
-        transcriptionFilePath: req.body.transcriptionFilePath,
-        videoFilePath: req.body.videoFilePath,
-        ancestors: update,
+        $set: { ancestors: update },
       },
     )
     .then((result) => {
@@ -296,13 +297,28 @@ app.post("/api/db/transcripts", async (req, res, next) => {
     });
 });
 
+app.put("/api/db/transcripts", async (req, res, next) => {
+  const updatedName = req.body.newName;
+  collectionTranscriptions
+    .update(
+      { transcriptionFilePath: req.body.transcriptionFilePath },
+      {
+        $set: { name: updatedName },
+      },
+    )
+    .then((result) => {
+      res.send(result);
+    });
+});
+
+app.delete("/api/db/folders", async (req, res, next) => {
+  let folders = req.body;
+  collectionFolders.replaceOne({}, folders);
+});
+
 const uploadTransToDB = (transArray, index) => {
   transArray.forEach((transcript) => {
     let filePathQuery = transcript.transcriptionFilePath;
-
-    let transcriptionFilePath = transcript.transcriptionFilePath;
-    let videoFilePath = transcript.videoFilePath;
-    let ancestors = transcript.ancestors;
 
     collectionTranscriptions.update(
       { transcriptionFilePath: filePathQuery },
