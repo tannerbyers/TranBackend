@@ -10,7 +10,7 @@ const db = require("./db.js");
 const MongoClient = require("mongodb").MongoClient;
 const google = require("./Google.js");
 const linear16 = require("linear16");
-
+const resource = require("./ResourceRequest")
 console.log("Server has started (not listening)");
 const MongoDBurl =
   "mongodb+srv://joemama:gogogo@transcripturecluster-dan2o.mongodb.net/test?retryWrites=true&w=majority";
@@ -64,7 +64,6 @@ const base64encodedClientIdAndSecret =
   "d3ZhVkQ2aXRUbWU0UDlZQm1QTVprZzoyczB5WEQ1Q1hqM1NtNDlHQ3hVT3hKVGVEUGRGSWR5Yw==";
 
 // Put all API endpoints under '/api'
-
 app.post("/api/auth", (newreq, response) => {
   console.log("Auth Code Received", newreq.body.code);
   userAuthCode = newreq.body.code;
@@ -317,6 +316,14 @@ const uploadTransToDB = (transArray, index) => {
     );
   });
 };
+
+app.get("/api/video", async (req, res, next) => {
+  console.log(__dirname + '/ZoomMedia/testfile0.m4a', "requested")
+    res.download(__dirname + '/ZoomMedia/testfile0.m4a')
+});
+
+
+
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
