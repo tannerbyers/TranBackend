@@ -186,7 +186,6 @@ app.get("/api/recordings", async (req, response, next) => {
         console.log("we're starting the transcription");
 
         let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
-
         request(videoUrls[i].recording_files[1].download_url).pipe(file);
 
         file.on("finish", async () => {
@@ -216,6 +215,7 @@ app.get("/api/recordings", async (req, response, next) => {
                       i,
                     ]}.txt`,
                     videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
+                    playUrl: `${videoUrls[i].recording_files[0].download_url}`,
                     ancestors: ["Home"],
                     recordingDate: videoUrls[i]["start_time"],
                     duration: videoUrls[i].duration,
@@ -332,14 +332,6 @@ const uploadTransToDB = (transArray, index) => {
     );
   });
 };
-
-app.get("/api/video", async (req, res, next) => {
-  console.log(__dirname + '/ZoomMedia/testfile0.m4a', "requested")
-    res.download(__dirname + '/ZoomMedia/testfile0.m4a')
-});
-
-
-
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
