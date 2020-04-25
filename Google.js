@@ -5,9 +5,10 @@ const storage = new Storage();
 const client = new speech.SpeechClient();
 
 async function uploadToBucket(bucketName, filename) {
-  console.log("upload to bucket requested");
+  console.log("upload to bucket requested for", filename);
   // Uploads a local file to the bucket
   await storage.bucket(bucketName).upload(filename, {
+    resumable: false,
     // Support for HTTP requests made with `Accept-Encoding: gzip`
     //gzip: true,
     // By setting the option `destination`, you can change the name of the
@@ -16,8 +17,8 @@ async function uploadToBucket(bucketName, filename) {
       // Enable long-lived HTTP caching headers
       // Use only if the contents of the file will never change
       // (If the contents will change, use cacheControl: 'no-cache')
-      cacheControl: "public, max-age=31536000",
-      //cacheControl: "no-cache",
+      //cacheControl: "public, max-age=31536000",
+      cacheControl: "no-cache",
     },
   });
   console.log(`${filename} uploaded to ${bucketName}.`);

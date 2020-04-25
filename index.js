@@ -173,80 +173,91 @@ app.get("/api/recordings", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-      console.log("Get Meetings Data Response", res.body.ops);
-      let firstFile = JSON.parse(res.body).meetings[0].recording_files[1]
-        .download_url;
 
-      let videoUrls = JSON.parse(res.body).meetings;
+      // Uncomment to see what the Meetings API is sending back
+      //console.log("Get Meetings Data Response", res.body);
 
-      console.log(videoUrls);
+      let meetingsList = JSON.parse(res.body).meetings;
+
+      //console.log("Meetings List", meetingsList);
       arrayOfAudioPathAndTranscriptionPath = [];
 
-      for (let i = 0; i < videoUrls.length; i++) {
+      for (let i = 0; i < meetingsList.length; i++) {
         console.log("we're starting the transcription");
 
         let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
+        console.log("Began creating" + `./ZoomMedia/testfile${[i]}.m4a`)
+        const M4AVideoUrls = meetingsList[i].recording_files.filter(recording => recording.file_type === "M4A");
+        request(M4AVideoUrls[0].download_url).pipe(file);
+        console.log("Beginning download for", M4AVideoUrls[0].download_url)
 
-        request(videoUrls[i].recording_files[1].download_url).pipe(file);
+        file.on('error', function (err, stdout, stderr) {
+          console.log('An error occurred: ' + err.message, err, stderr);
+        })
 
         file.on("finish", async () => {
-          console.log("does this ever finish?");
-          const outPath = linear16(
-            `./ZoomMedia/testfile${[i]}.m4a`,
-            `./ConvertedMedia/testfile${[i]}.wav`,
-          );
           const bucket = "trans-audiofiles";
           const audioFile = `./ConvertedMedia/testfile${[i]}.wav`;
           console.log("Transcription Called");
-          google
-            .uploadToBucket(bucket, audioFile)
-            .then(async () => {
-              let transcript = google.transcribe(
-                `gs://${bucket}/${audioFile.split("/").pop()}`,
-              );
-              return await transcript;
-            })
-            .then((result) => {
-              fs.writeFile(
-                `./ConvertedMedia/testfile${[i]}.txt`,
-                result,
-                function (err) {
-                  arrayOfAudioPathAndTranscriptionPath.push({
-                    transcriptionFilePath: `./ConvertedMedia/testfile${[
-                      i,
-                    ]}.txt`,
-                    videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
-                    ancestors: ["Home"],
-                    recordingDate: videoUrls[i]["start_time"],
-                    duration: videoUrls[i].duration,
-                    name: `./ConvertedMedia/testfile${[i]}.txt`,
-                  });
-                  if (
-                    arrayOfAudioPathAndTranscriptionPath.length ===
-                    videoUrls.length
-                  ) {
-                    console.log("did this finish?");
-                    uploadTransToDB(arrayOfAudioPathAndTranscriptionPath);
-                    response.send(arrayOfAudioPathAndTranscriptionPath);
-                  } else {
+
+
+          linear16(
+            `./ZoomMedia/testfile${[i]}.m4a`,
+            `./ConvertedMedia/testfile${[i]}.wav`,
+          ).then(() => {
+            google
+              .uploadToBucket(bucket, audioFile)
+              .then(async () => {
+                let transcript = google.transcribe(
+                  `gs://${bucket}/${audioFile.split("/").pop()}`,
+                );
+                return await transcript;
+              })
+              .then((result) => {
+                console.log("RESULT OF TRANSCRIBE", result)
+                fs.writeFile(
+                  `./ConvertedMedia/testfile${[i]}.txt`,
+                  result,
+                  function (err) {
+                    arrayOfAudioPathAndTranscriptionPath.push({
+                      transcriptionFilePath: `./ConvertedMedia/testfile${[
+                        i,
+                      ]}.txt`,
+                      videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
+                      ancestors: ["Home"],
+                      recordingDate: meetingsList[i]["start_time"],
+                      duration: meetingsList[i].duration,
+                      name: `./ConvertedMedia/testfile${[i]}.txt`,
+                    });
+                    if (
+                      arrayOfAudioPathAndTranscriptionPath.length ===
+                      meetingsList.length
+                    ) {
+                      console.log("did this finish?");
+                      uploadTransToDB(arrayOfAudioPathAndTranscriptionPath);
+                      response.send(arrayOfAudioPathAndTranscriptionPath);
+                    } else {
+                      console.log(
+                        "arrayOfAudioPathAndTranscriptionPath",
+                        arrayOfAudioPathAndTranscriptionPath.length,
+                      );
+                      console.log("meetingsList.length", meetingsList.length);
+                    }
+                    if (err) throw err;
                     console.log(
-                      "arrayOfAudioPathAndTranscriptionPath",
-                      arrayOfAudioPathAndTranscriptionPath.length,
+                      `./ConvertedMedia/testfile${[
+                        i,
+                      ]}.txt is created successfully.`,
                     );
-                    console.log("videoUrls.length", videoUrls.length);
-                  }
-                  if (err) throw err;
-                  console.log(
-                    `./ConvertedMedia/testfile${[
-                      i,
-                    ]}.txt is created successfully.`,
-                  );
-                },
-              );
-            });
-        });
-        // For Loop ends
-        console.log("ITS OVER BABY");
+                  },
+                );
+              });
+
+          });
+          // For Loop ends
+          console.log("For Loop has finished");
+        }
+        )
       }
     },
   );
@@ -335,7 +346,7 @@ const uploadTransToDB = (transArray, index) => {
 
 app.get("/api/video", async (req, res, next) => {
   console.log(__dirname + '/ZoomMedia/testfile0.m4a', "requested")
-    res.download(__dirname + '/ZoomMedia/testfile0.m4a')
+  res.download(__dirname + '/ZoomMedia/testfile0.m4a')
 });
 
 
