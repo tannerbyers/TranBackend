@@ -188,6 +188,8 @@ app.get("/api/recordings", async (req, response, next) => {
         let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
         console.log("Began creating" + `./ZoomMedia/testfile${[i]}.m4a`)
         const M4AVideoUrls = meetingsList[i].recording_files.filter(recording => recording.file_type === "M4A");
+        const MP4VideoUrls = meetingsList[i].recording_files.filter(recording => recording.file_type === "MP4");
+
         request(M4AVideoUrls[0].download_url).pipe(file);
         console.log("Beginning download for", M4AVideoUrls[0].download_url)
 
@@ -224,6 +226,7 @@ app.get("/api/recordings", async (req, response, next) => {
                         i,
                       ]}.txt`,
                       videoFilePath: `./ZoomMedia/testfile${[i]}.m4a`,
+                      playUrl: MP4VideoUrls[0].download_url,
                       ancestors: ["Home"],
                       recordingDate: meetingsList[i]["start_time"],
                       duration: meetingsList[i].duration,
