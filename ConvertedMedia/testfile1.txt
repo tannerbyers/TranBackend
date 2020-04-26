@@ -1,6 +1,6 @@
-Speaker3: I Layton
+Speaker1: I Layton
 Speaker2: what's up Tanner
-Speaker3: how was your day
+Speaker1: how was your day
 Speaker2: I had a good day I finally figured out how to get past the permission issue on Google Cloud
-Speaker3: muy bien me gusta a computer computer science o
+Speaker1: muy bien me gusta a computer computer science o
 Speaker2: language kid
