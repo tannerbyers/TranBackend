@@ -1,35 +1,35 @@
-Speaker1: Cloud K so we need to go in here and reset this right does it need to be diluted think so updates so how that works I may just broke up more I don't know we'll see Kay login I think I broke it or suffer garage how to draw some pics us see you in a call on Discord going to ask him to join ya
-Speaker2: I'm fixing the the prime real quick hello Google
-Speaker1: let us know when it is
-Speaker2: fixed 6 / seat want to see if this this should fix it okily dokily I believe
-Speaker1: is a fixed
-Speaker2: I just made it by just made a request for the client are making the poor pussy just pushed it up it was there I'm going to go fix the fix in the database really quick as well
-Speaker1: 8000 requests to the speech-to-text API
-Speaker2: make sure it's not charging me Alicia Target you should be good to make request to be transcripts transcripts
-Speaker1: transcripts to be transcribed and then added to our database so next thing you need can you add that to the Trello board is the loading screen cuz that's going to be very important since we're
-Speaker2: the perfect
-Speaker1: and then yeah we need to add some text says you know getting your transcriptions are creating a
-Speaker2: transcription something like that
-Speaker1: yes we still have 292 bucks out of our 300 I think we can make a nice little business from this I
-Speaker2: come check a request is failure because do we move to remove key or the on the request to the end of a transcripts
-Speaker1: cannot read download URL of undefined maybe it's not available
-Speaker2: yet is your other other transcripts now they should load shouldn't they
-Speaker1: not if this is the first one that comes up doesn't have a download
-Speaker2: URL I will also help still put it inside the thing though
-Speaker1: inside the thing
-Speaker2: inside like it'll still try to little so give it like an object that does not have we
-Speaker1: probably just it may have like a player of them or something like that like at the meeting may have a meeting title but no why is this not requesting the
-Speaker2: is it the key problem or
-Speaker1: so there's no problem best raps against a log out data response on defiant so that's the normal what did you just push to master tell three fresh the only thing I changed lately and I haven't postmaster straight up
-Speaker2: no effect on. When you download them login what's your terminals
-Speaker1: it's giving me this error of cannot read property 0 of
-Speaker2: undefined let's see where this one Sagan
-Speaker1: you're right you're right let's go
-Speaker2: oh wait
-Speaker1: no it does not do that meaning wasn't uploaded to the cloud what am I saying cuz that's that's why we're doing this right now because I saved it to my local computer so never got upsetted so maybe it has something different maybe it is and maybe it is in the meeting list but it doesn't have a download of play URL because it's not actually saved but it is saved as a meeting re it's a meeting entry but there's no download or play
-Speaker2: euro rate so let's I mean
-Speaker1: let's do this real quick so we go to zoom we login we can see our meetings so my recordings go to my meetings previous
-Speaker2: so there's one processing
-Speaker1: 12:39 now as far as the last one okay well that's an issue because that breaks our
-Speaker2: system it will just have to do what we said is like check if it's if it's some
-Speaker1: okay. Do you want to stop Cloud recording if you ask you will receive
+Speaker2: Cloud K so we need to go in here and reset this right does it need to be diluted think so updates so how that works I may just broke up more I don't know we'll see Kay login I think I broke it or suffer garage how to draw some pics us see you in a call on Discord going to ask him to join ya
+Speaker1: I'm fixing the the prime real quick hello Google
+Speaker2: let us know when it is
+Speaker1: fixed 6 / seat want to see if this this should fix it okily dokily I believe
+Speaker2: is a fixed
+Speaker1: I just made it by just made a request for the client are making the poor pussy just pushed it up it was there I'm going to go fix the fix in the database really quick as well
+Speaker2: 8000 requests to the speech-to-text API
+Speaker1: make sure it's not charging me Alicia Target you should be good to make request to be transcripts transcripts
+Speaker2: transcripts to be transcribed and then added to our database so next thing you need can you add that to the Trello board is the loading screen cuz that's going to be very important since we're
+Speaker1: the perfect
+Speaker2: and then yeah we need to add some text says you know getting your transcriptions are creating a
+Speaker1: transcription something like that
+Speaker2: yes we still have 292 bucks out of our 300 I think we can make a nice little business from this I
+Speaker1: come check a request is failure because do we move to remove key or the on the request to the end of a transcripts
+Speaker2: cannot read download URL of undefined maybe it's not available
+Speaker1: yet is your other other transcripts now they should load shouldn't they
+Speaker2: not if this is the first one that comes up doesn't have a download
+Speaker1: URL I will also help still put it inside the thing though
+Speaker2: inside the thing
+Speaker1: inside like it'll still try to little so give it like an object that does not have we
+Speaker2: probably just it may have like a player of them or something like that like at the meeting may have a meeting title but no why is this not requesting the
+Speaker1: is it the key problem or
+Speaker2: so there's no problem best raps against a log out data response on defiant so that's the normal what did you just push to master tell three fresh the only thing I changed lately and I haven't postmaster straight up
+Speaker1: no effect on. When you download them login what's your terminals
+Speaker2: it's giving me this error of cannot read property 0 of
+Speaker1: undefined let's see where this one Sagan
+Speaker2: you're right you're right let's go
+Speaker1: oh wait
+Speaker2: no it does not do that meaning wasn't uploaded to the cloud what am I saying cuz that's that's why we're doing this right now because I saved it to my local computer so never got upsetted so maybe it has something different maybe it is and maybe it is in the meeting list but it doesn't have a download of play URL because it's not actually saved but it is saved as a meeting re it's a meeting entry but there's no download or play
+Speaker1: euro rate so let's I mean
+Speaker2: let's do this real quick so we go to zoom we login we can see our meetings so my recordings go to my meetings previous
+Speaker1: so there's one processing
+Speaker2: 12:39 now as far as the last one okay well that's an issue because that breaks our
+Speaker1: system it will just have to do what we said is like check if it's if it's some
+Speaker2: okay. Do you want to stop Cloud recording if you ask you will receive

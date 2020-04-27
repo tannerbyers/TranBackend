@@ -10,7 +10,7 @@ const db = require("./db.js");
 const MongoClient = require("mongodb").MongoClient;
 const google = require("./Google.js");
 const linear16 = require("linear16");
-const resource = require("./ResourceRequest")
+const resource = require("./ResourceRequest");
 console.log("Server has started (not listening)");
 const MongoDBurl =
   "mongodb+srv://joemama:gogogo@transcripturecluster-dan2o.mongodb.net/test?retryWrites=true&w=majority";
@@ -173,7 +173,6 @@ app.get("/api/recordings", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-
       // Uncomment to see what the Meetings API is sending back
       //console.log("Get Meetings Data Response", res.body);
 
@@ -186,22 +185,25 @@ app.get("/api/recordings", async (req, response, next) => {
         console.log("we're starting the transcription");
 
         let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
-        console.log("Began creating" + `./ZoomMedia/testfile${[i]}.m4a`)
-        const M4AVideoUrls = meetingsList[i].recording_files.filter(recording => recording.file_type === "M4A");
-        const MP4VideoUrls = meetingsList[i].recording_files.filter(recording => recording.file_type === "MP4");
+        console.log("Began creating" + `./ZoomMedia/testfile${[i]}.m4a`);
+        const M4AVideoUrls = meetingsList[i].recording_files.filter(
+          (recording) => recording.file_type === "M4A",
+        );
+        const MP4VideoUrls = meetingsList[i].recording_files.filter(
+          (recording) => recording.file_type === "MP4",
+        );
 
         request(M4AVideoUrls[0].download_url).pipe(file);
-        console.log("Beginning download for", M4AVideoUrls[0].download_url)
+        console.log("Beginning download for", M4AVideoUrls[0].download_url);
 
-        file.on('error', function (err, stdout, stderr) {
-          console.log('An error occurred: ' + err.message, err, stderr);
-        })
+        file.on("error", function (err, stdout, stderr) {
+          console.log("An error occurred: " + err.message, err, stderr);
+        });
 
         file.on("finish", async () => {
           const bucket = "trans-audiofiles";
           const audioFile = `./ConvertedMedia/testfile${[i]}.wav`;
           console.log("Transcription Called");
-
 
           linear16(
             `./ZoomMedia/testfile${[i]}.m4a`,
@@ -216,7 +218,7 @@ app.get("/api/recordings", async (req, response, next) => {
                 return await transcript;
               })
               .then((result) => {
-                console.log("RESULT OF TRANSCRIBE", result)
+                console.log("RESULT OF TRANSCRIBE", result);
                 fs.writeFile(
                   `./ConvertedMedia/testfile${[i]}.txt`,
                   result,
@@ -255,12 +257,10 @@ app.get("/api/recordings", async (req, response, next) => {
                   },
                 );
               });
-
           });
           // For Loop ends
           console.log("For Loop has finished");
-        }
-        )
+        });
       }
     },
   );
@@ -296,8 +296,9 @@ app.post("/api/db/folders", async (req, res, next) => {
 });
 
 app.post("/api/db/transcripts", async (req, res, next) => {
-  const match = req.body.transcriptionFilePath;
-  const update = req.body.newAncestors;
+  let match = req.body.transcriptionFilePath;
+  let update = req.body.newAncestors;
+  console.log("updated ancestors", update);
   collectionTranscriptions
     .update(
       { transcriptionFilePath: match },
@@ -311,7 +312,7 @@ app.post("/api/db/transcripts", async (req, res, next) => {
 });
 
 app.put("/api/db/transcripts", async (req, res, next) => {
-  const updatedName = req.body.newName;
+  let updatedName = req.body.newName;
   collectionTranscriptions
     .update(
       { transcriptionFilePath: req.body.transcriptionFilePath },
@@ -348,12 +349,9 @@ const uploadTransToDB = (transArray, index) => {
 };
 
 app.get("/api/video", async (req, res, next) => {
-  console.log(__dirname + '/ZoomMedia/testfile0.m4a', "requested")
-  res.download(__dirname + '/ZoomMedia/testfile0.m4a')
+  console.log(__dirname + "/ZoomMedia/testfile0.m4a", "requested");
+  res.download(__dirname + "/ZoomMedia/testfile0.m4a");
 });
-
-
-
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
