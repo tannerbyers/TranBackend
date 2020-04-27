@@ -18,12 +18,12 @@ const MongoDBurl =
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  }),
+  })
 );
 app.use(
   bodyParser.json({
     extended: true,
-  }),
+  })
 );
 
 // ALLOWS CORS
@@ -34,13 +34,13 @@ app.use(function (req, res, next) {
   // Request methods you wish to allow
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
   );
 
   // Request headers you wish to allow
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type",
+    "X-Requested-With,content-type"
   );
 
   // Set to true if you need the website to include cookies in the requests sent
@@ -117,7 +117,7 @@ app.post("/api/auth", (newreq, response) => {
             response.send("New Accses token issue. Check backend logs");
           }
         });
-      },
+      }
     );
   }
 });
@@ -131,10 +131,9 @@ app.get("/api/token", async (req, res, next) => {
   });
 });
 
-// This is not currently being used. Not sure if it works properly
 app.get("/api/me", async (req, response, next) => {
   let url = "https://api.zoom.us/v2/users/me";
-  console.log("me token : ", accessToken);
+  console.log("\n\n/api/me HIT");
 
   request(
     {
@@ -145,7 +144,6 @@ app.get("/api/me", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-      //console.log(res)
       let me = JSON.parse(res.body);
       let userDataPromise = new Promise(function (resolve, reject) {
         return resolve(me);
@@ -157,7 +155,7 @@ app.get("/api/me", async (req, response, next) => {
 
         response.send(data);
       });
-    },
+    }
   );
 });
 
@@ -207,13 +205,13 @@ app.get("/api/recordings", async (req, response, next) => {
 
           linear16(
             `./ZoomMedia/testfile${[i]}.m4a`,
-            `./ConvertedMedia/testfile${[i]}.wav`,
+            `./ConvertedMedia/testfile${[i]}.wav`
           ).then(() => {
             google
               .uploadToBucket(bucket, audioFile)
               .then(async () => {
                 let transcript = google.transcribe(
-                  `gs://${bucket}/${audioFile.split("/").pop()}`,
+                  `gs://${bucket}/${audioFile.split("/").pop()}`
                 );
                 return await transcript;
               })
@@ -244,7 +242,7 @@ app.get("/api/recordings", async (req, response, next) => {
                     } else {
                       console.log(
                         "arrayOfAudioPathAndTranscriptionPath",
-                        arrayOfAudioPathAndTranscriptionPath.length,
+                        arrayOfAudioPathAndTranscriptionPath.length
                       );
                       console.log("meetingsList.length", meetingsList.length);
                     }
@@ -252,9 +250,9 @@ app.get("/api/recordings", async (req, response, next) => {
                     console.log(
                       `./ConvertedMedia/testfile${[
                         i,
-                      ]}.txt is created successfully.`,
+                      ]}.txt is created successfully.`
                     );
-                  },
+                  }
                 );
               });
           });
@@ -262,7 +260,7 @@ app.get("/api/recordings", async (req, response, next) => {
           console.log("For Loop has finished");
         });
       }
-    },
+    }
   );
 });
 
@@ -304,7 +302,7 @@ app.post("/api/db/transcripts", async (req, res, next) => {
       { transcriptionFilePath: match },
       {
         $set: { ancestors: update },
-      },
+      }
     )
     .then((result) => {
       res.send(result);
@@ -318,7 +316,7 @@ app.put("/api/db/transcripts", async (req, res, next) => {
       { transcriptionFilePath: req.body.transcriptionFilePath },
       {
         $set: { name: updatedName },
-      },
+      }
     )
     .then((result) => {
       res.send(result);
@@ -343,7 +341,7 @@ const uploadTransToDB = (transArray, index) => {
           console.log(error);
         }
         //Do stuff here
-      },
+      }
     );
   });
 };
@@ -366,7 +364,7 @@ app.listen(port, () => {
       collectionUsers = database.collection("users");
       collectionTranscriptions = database.collection("transcriptions");
       collectionFolders = database.collection("folders");
-    },
+    }
   );
 });
 
