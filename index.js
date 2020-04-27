@@ -185,10 +185,10 @@ app.get("/api/recordings", async (req, response, next) => {
         let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
         console.log("Began creating" + `./ZoomMedia/testfile${[i]}.m4a`);
         const M4AVideoUrls = meetingsList[i].recording_files.filter(
-          (recording) => recording.file_type === "M4A"
+          (recording) => recording.file_type === "M4A",
         );
         const MP4VideoUrls = meetingsList[i].recording_files.filter(
-          (recording) => recording.file_type === "MP4"
+          (recording) => recording.file_type === "MP4",
         );
 
         request(M4AVideoUrls[0].download_url).pipe(file);
@@ -294,8 +294,9 @@ app.post("/api/db/folders", async (req, res, next) => {
 });
 
 app.post("/api/db/transcripts", async (req, res, next) => {
-  const match = req.body.transcriptionFilePath;
-  const update = req.body.newAncestors;
+  let match = req.body.transcriptionFilePath;
+  let update = req.body.newAncestors;
+  console.log("updated ancestors", update);
   collectionTranscriptions
     .update(
       { transcriptionFilePath: match },
@@ -309,7 +310,7 @@ app.post("/api/db/transcripts", async (req, res, next) => {
 });
 
 app.put("/api/db/transcripts", async (req, res, next) => {
-  const updatedName = req.body.newName;
+  let updatedName = req.body.newName;
   collectionTranscriptions
     .update(
       { transcriptionFilePath: req.body.transcriptionFilePath },

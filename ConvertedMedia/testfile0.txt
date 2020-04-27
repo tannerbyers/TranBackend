@@ -3,8 +3,8 @@ Speaker1: I'm fixing the the prime real quick hello Google
 Speaker2: let us know when it is
 Speaker1: fixed 6 / seat want to see if this this should fix it okily dokily I believe
 Speaker2: is a fixed
-Speaker1: I just made it by just made a request for the client are making the poor pussy just pushed it up it was there I'm going to go fix the fix in the database really quick as well 8000
-Speaker2: requests to the speech-to-text API
+Speaker1: I just made it by just made a request for the client are making the poor pussy just pushed it up it was there I'm going to go fix the fix in the database really quick as well
+Speaker2: 8000 requests to the speech-to-text API
 Speaker1: make sure it's not charging me Alicia Target you should be good to make request to be transcripts transcripts
 Speaker2: transcripts to be transcribed and then added to our database so next thing you need can you add that to the Trello board is the loading screen cuz that's going to be very important since we're
 Speaker1: the perfect
