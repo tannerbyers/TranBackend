@@ -10,7 +10,7 @@ const db = require("./db.js");
 const MongoClient = require("mongodb").MongoClient;
 const google = require("./Google.js");
 const linear16 = require("linear16");
-const resource = require("./ResourceRequest")
+const resource = require("./ResourceRequest");
 console.log("Server has started (not listening)");
 const MongoDBurl =
   "mongodb+srv://joemama:gogogo@transcripturecluster-dan2o.mongodb.net/test?retryWrites=true&w=majority";
@@ -18,12 +18,12 @@ const MongoDBurl =
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  }),
+  })
 );
 app.use(
   bodyParser.json({
     extended: true,
-  }),
+  })
 );
 
 // ALLOWS CORS
@@ -34,13 +34,13 @@ app.use(function (req, res, next) {
   // Request methods you wish to allow
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
   );
 
   // Request headers you wish to allow
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type",
+    "X-Requested-With,content-type"
   );
 
   // Set to true if you need the website to include cookies in the requests sent
@@ -117,7 +117,7 @@ app.post("/api/auth", (newreq, response) => {
             response.send("New Accses token issue. Check backend logs");
           }
         });
-      },
+      }
     );
   }
 });
@@ -131,10 +131,9 @@ app.get("/api/token", async (req, res, next) => {
   });
 });
 
-// This is not currently being used. Not sure if it works properly
 app.get("/api/me", async (req, response, next) => {
   let url = "https://api.zoom.us/v2/users/me";
-  console.log("me token : ", accessToken);
+  console.log("\n\n/api/me HIT");
 
   request(
     {
@@ -145,7 +144,6 @@ app.get("/api/me", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-      //console.log(res)
       let me = JSON.parse(res.body);
       let userDataPromise = new Promise(function (resolve, reject) {
         return resolve(me);
@@ -157,7 +155,7 @@ app.get("/api/me", async (req, response, next) => {
 
         response.send(data);
       });
-    },
+    }
   );
 });
 
@@ -173,7 +171,6 @@ app.get("/api/recordings", async (req, response, next) => {
       method: "GET",
     },
     async function (err, res, body) {
-
       // Uncomment to see what the Meetings API is sending back
       //console.log("Get Meetings Data Response", res.body);
 
@@ -186,37 +183,40 @@ app.get("/api/recordings", async (req, response, next) => {
         console.log("we're starting the transcription");
 
         let file = fs.createWriteStream(`./ZoomMedia/testfile${[i]}.m4a`);
-        console.log("Began creating" + `./ZoomMedia/testfile${[i]}.m4a`)
-        const M4AVideoUrls = meetingsList[i].recording_files.filter(recording => recording.file_type === "M4A");
-        const MP4VideoUrls = meetingsList[i].recording_files.filter(recording => recording.file_type === "MP4");
+        console.log("Began creating" + `./ZoomMedia/testfile${[i]}.m4a`);
+        const M4AVideoUrls = meetingsList[i].recording_files.filter(
+          (recording) => recording.file_type === "M4A"
+        );
+        const MP4VideoUrls = meetingsList[i].recording_files.filter(
+          (recording) => recording.file_type === "MP4"
+        );
 
         request(M4AVideoUrls[0].download_url).pipe(file);
-        console.log("Beginning download for", M4AVideoUrls[0].download_url)
+        console.log("Beginning download for", M4AVideoUrls[0].download_url);
 
-        file.on('error', function (err, stdout, stderr) {
-          console.log('An error occurred: ' + err.message, err, stderr);
-        })
+        file.on("error", function (err, stdout, stderr) {
+          console.log("An error occurred: " + err.message, err, stderr);
+        });
 
         file.on("finish", async () => {
           const bucket = "trans-audiofiles";
           const audioFile = `./ConvertedMedia/testfile${[i]}.wav`;
           console.log("Transcription Called");
 
-
           linear16(
             `./ZoomMedia/testfile${[i]}.m4a`,
-            `./ConvertedMedia/testfile${[i]}.wav`,
+            `./ConvertedMedia/testfile${[i]}.wav`
           ).then(() => {
             google
               .uploadToBucket(bucket, audioFile)
               .then(async () => {
                 let transcript = google.transcribe(
-                  `gs://${bucket}/${audioFile.split("/").pop()}`,
+                  `gs://${bucket}/${audioFile.split("/").pop()}`
                 );
                 return await transcript;
               })
               .then((result) => {
-                console.log("RESULT OF TRANSCRIBE", result)
+                console.log("RESULT OF TRANSCRIBE", result);
                 fs.writeFile(
                   `./ConvertedMedia/testfile${[i]}.txt`,
                   result,
@@ -242,7 +242,7 @@ app.get("/api/recordings", async (req, response, next) => {
                     } else {
                       console.log(
                         "arrayOfAudioPathAndTranscriptionPath",
-                        arrayOfAudioPathAndTranscriptionPath.length,
+                        arrayOfAudioPathAndTranscriptionPath.length
                       );
                       console.log("meetingsList.length", meetingsList.length);
                     }
@@ -250,19 +250,17 @@ app.get("/api/recordings", async (req, response, next) => {
                     console.log(
                       `./ConvertedMedia/testfile${[
                         i,
-                      ]}.txt is created successfully.`,
+                      ]}.txt is created successfully.`
                     );
-                  },
+                  }
                 );
               });
-
           });
           // For Loop ends
           console.log("For Loop has finished");
-        }
-        )
+        });
       }
-    },
+    }
   );
 });
 
@@ -303,7 +301,7 @@ app.post("/api/db/transcripts", async (req, res, next) => {
       { transcriptionFilePath: match },
       {
         $set: { ancestors: update },
-      },
+      }
     )
     .then((result) => {
       res.send(result);
@@ -317,7 +315,7 @@ app.put("/api/db/transcripts", async (req, res, next) => {
       { transcriptionFilePath: req.body.transcriptionFilePath },
       {
         $set: { name: updatedName },
-      },
+      }
     )
     .then((result) => {
       res.send(result);
@@ -342,18 +340,15 @@ const uploadTransToDB = (transArray, index) => {
           console.log(error);
         }
         //Do stuff here
-      },
+      }
     );
   });
 };
 
 app.get("/api/video", async (req, res, next) => {
-  console.log(__dirname + '/ZoomMedia/testfile0.m4a', "requested")
-  res.download(__dirname + '/ZoomMedia/testfile0.m4a')
+  console.log(__dirname + "/ZoomMedia/testfile0.m4a", "requested");
+  res.download(__dirname + "/ZoomMedia/testfile0.m4a");
 });
-
-
-
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
@@ -368,7 +363,7 @@ app.listen(port, () => {
       collectionUsers = database.collection("users");
       collectionTranscriptions = database.collection("transcriptions");
       collectionFolders = database.collection("folders");
-    },
+    }
   );
 });
 
