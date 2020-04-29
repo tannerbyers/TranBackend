@@ -346,10 +346,12 @@ const uploadTransToDB = (transArray, index) => {
   });
 };
 
-app.get("/api/video", async (req, res, next) => {
-  console.log(__dirname + "/ZoomMedia/testfile0.m4a", "requested");
-  res.download(__dirname + "/ZoomMedia/testfile0.m4a");
+app.get("/api/export/transcript?", async (req, res, next) => {
+  console.log(__dirname + req.query)
+  res.download(__dirname + req.query.filepath);
 });
+
+
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
