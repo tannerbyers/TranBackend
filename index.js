@@ -18,12 +18,12 @@ const MongoDBurl =
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  })
+  }),
 );
 app.use(
   bodyParser.json({
     extended: true,
-  })
+  }),
 );
 
 // ALLOWS CORS
@@ -34,13 +34,13 @@ app.use(function (req, res, next) {
   // Request methods you wish to allow
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE",
   );
 
   // Request headers you wish to allow
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
+    "X-Requested-With,content-type",
   );
 
   // Set to true if you need the website to include cookies in the requests sent
@@ -117,7 +117,7 @@ app.post("/api/auth", (newreq, response) => {
             response.send("New Accses token issue. Check backend logs");
           }
         });
-      }
+      },
     );
   }
 });
@@ -155,7 +155,7 @@ app.get("/api/me", async (req, response, next) => {
 
         response.send(data);
       });
-    }
+    },
   );
 });
 
@@ -205,13 +205,13 @@ app.get("/api/recordings", async (req, response, next) => {
 
           linear16(
             `./ZoomMedia/testfile${[i]}.m4a`,
-            `./ConvertedMedia/testfile${[i]}.wav`
+            `./ConvertedMedia/testfile${[i]}.wav`,
           ).then(() => {
             google
               .uploadToBucket(bucket, audioFile)
               .then(async () => {
                 let transcript = google.transcribe(
-                  `gs://${bucket}/${audioFile.split("/").pop()}`
+                  `gs://${bucket}/${audioFile.split("/").pop()}`,
                 );
                 return await transcript;
               })
@@ -242,7 +242,7 @@ app.get("/api/recordings", async (req, response, next) => {
                     } else {
                       console.log(
                         "arrayOfAudioPathAndTranscriptionPath",
-                        arrayOfAudioPathAndTranscriptionPath.length
+                        arrayOfAudioPathAndTranscriptionPath.length,
                       );
                       console.log("meetingsList.length", meetingsList.length);
                     }
@@ -250,9 +250,9 @@ app.get("/api/recordings", async (req, response, next) => {
                     console.log(
                       `./ConvertedMedia/testfile${[
                         i,
-                      ]}.txt is created successfully.`
+                      ]}.txt is created successfully.`,
                     );
-                  }
+                  },
                 );
               });
           });
@@ -260,7 +260,7 @@ app.get("/api/recordings", async (req, response, next) => {
           console.log("For Loop has finished");
         });
       }
-    }
+    },
   );
 });
 
@@ -288,9 +288,9 @@ app.get("/api/db/folders", async (req, res, next) => {
 });
 
 app.post("/api/db/folders", async (req, res, next) => {
-  console.log(req.body);
-  let folders = req.body;
-  collectionFolders.replaceOne({}, folders);
+  collectionFolders
+    .replaceOne({}, { folders: { ...req.body.folders } })
+    .then((rep) => res.send("GOTTEM"));
 });
 
 app.post("/api/db/transcripts", async (req, res, next) => {
@@ -302,7 +302,7 @@ app.post("/api/db/transcripts", async (req, res, next) => {
       { transcriptionFilePath: match },
       {
         $set: { ancestors: update },
-      }
+      },
     )
     .then((result) => {
       res.send(result);
@@ -316,7 +316,7 @@ app.put("/api/db/transcripts", async (req, res, next) => {
       { transcriptionFilePath: req.body.transcriptionFilePath },
       {
         $set: { name: updatedName },
-      }
+      },
     )
     .then((result) => {
       res.send(result);
@@ -324,8 +324,8 @@ app.put("/api/db/transcripts", async (req, res, next) => {
 });
 
 app.delete("/api/db/folders", async (req, res, next) => {
-  let folders = req.body;
-  collectionFolders.replaceOne({}, folders);
+  let folders = req.body.folders;
+  collectionFolders.replaceOne({}, folders).then((rep) => res.send("gottem"));
 });
 
 const uploadTransToDB = (transArray, index) => {
@@ -341,7 +341,7 @@ const uploadTransToDB = (transArray, index) => {
           console.log(error);
         }
         //Do stuff here
-      }
+      },
     );
   });
 };
@@ -366,7 +366,7 @@ app.listen(port, () => {
       collectionUsers = database.collection("users");
       collectionTranscriptions = database.collection("transcriptions");
       collectionFolders = database.collection("folders");
-    }
+    },
   );
 });
 
