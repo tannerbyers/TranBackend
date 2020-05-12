@@ -1,3 +1,4 @@
 /node_modules
-/ZoomMedia/*
-/ConvertedMedia/*
+*.txt
+*.m4a
+*.wav
